@@ -55,11 +55,8 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
       setCastLoading(true);
       setCastError("");
 
-      const params = new URLSearchParams({
-        api_key: import.meta.env.VITE_TMDB_API_KEY,
-      });
       const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${movie.id}/credits?${params}`,
+        `/api/tmdb/movie/${movie.id}/credits`,
         { signal: controller.signal },
       );
 

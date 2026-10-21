@@ -7,7 +7,6 @@ import MoviesInfo from "./components/searchResult/MoviesInfo.jsx";
 // import movies from "./data/movies.js";
 import { useEffect, useState } from "react";
 
-const KEY = import.meta.env.VITE_TMDB_API_KEY;
 const WATCHED_MOVIES_STORAGE_KEY = "usePopcorn-watchedMovies";
 
 const options = {
@@ -67,13 +66,12 @@ function App() {
       let url;
       const params = new URLSearchParams({
         query: debouncedQuery.trim(),
-        api_key: KEY,
       });
 
       if (!debouncedQuery.trim()) {
-        url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${KEY}`;
+        url = "/api/tmdb/trending/movie/day";
       } else {
-        url = `https://api.themoviedb.org/3/search/movie?${params}`;
+        url = `/api/tmdb/search/movie?${params}`;
       }
 
       const response = await fetch(url, {
