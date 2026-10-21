@@ -64,6 +64,10 @@ function App() {
       setIsLoading(true);
       setError("");
 
+      if (!KEY) {
+        throw new Error("MISSING_API_KEY");
+      }
+
       let url;
       const params = new URLSearchParams({
         query: debouncedQuery.trim(),
@@ -92,7 +96,11 @@ function App() {
       .catch((requestError) => {
         if (requestError.name !== "AbortError") {
           console.error(requestError);
-          setError("Could not load movies. Please try again.");
+          setError(
+            requestError.message === "MISSING_API_KEY"
+              ? "TMDB API key is missing. Set VITE_TMDB_API_KEY and rebuild the site."
+              : "Could not load movies. Please try again.",
+          );
         }
       })
       .finally(() => {
