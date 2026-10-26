@@ -1,6 +1,6 @@
 import MovieSearchList from "./MovieList.jsx";
 
-function WatchedMoviesSummary({ movies = [], onMovieInfo }) {
+function WatchedMoviesSummary({ movies = [], onMovieInfo, onDeleteWatched }) {
   const averageUserRating =
     movies.length > 0
       ? (
@@ -27,6 +27,7 @@ function WatchedMoviesSummary({ movies = [], onMovieInfo }) {
         <MovieSearchList
           movies={movies}
           onMovieInfo={onMovieInfo}
+          onDelete={onDeleteWatched}
           showUserRating
         />
       ) : (

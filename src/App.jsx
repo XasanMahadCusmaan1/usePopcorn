@@ -112,6 +112,12 @@ function App() {
     setSelectedMovie(movie);
   }
 
+  function onDeleteWatched(movieId) {
+    setWatchedMovies((currentMovies) =>
+      currentMovies.filter((movie) => movie.id !== movieId),
+    );
+  }
+
   function onAddToWatchlist(movie, userRating) {
     setWatchedMovies((currentMovies) => {
       const alreadyWatched = currentMovies.some(
@@ -175,6 +181,7 @@ function App() {
             <WatchedMoviesSummary
               movies={watchedMovies}
               onMovieInfo={onMovieInfo}
+              onDeleteWatched={onDeleteWatched}
             />
           </CollapsiblePanel>
         )}
