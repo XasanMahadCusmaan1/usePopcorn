@@ -43,7 +43,12 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
   const [actors, setActors] = useState([]);
   const [castLoading, setCastLoading] = useState(true);
   const [castError, setCastError] = useState("");
-  const title = movie.title || movie.original_title || "Untitled movie";
+
+  // TV shows use `name` and `first_air_date`, movies use `title` and `release_date`
+  const isTV = movie.media_type === "tv";
+  const title = movie.title || movie.name || movie.original_title || movie.original_name || "Untitled";
+  const releaseDate = movie.release_date || movie.first_air_date;
+
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : null;
@@ -58,8 +63,13 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
       const params = new URLSearchParams({
         api_key: import.meta.env.VITE_TMDB_API_KEY,
       });
+
+      // TMDB has separate credits endpoints for movies vs TV shows
+      // movie:  /3/movie/{id}/credits
+      // TV show: /3/tv/{id}/credits
+      const mediaType = isTV ? "tv" : "movie";
       const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${movie.id}/credits?${params}`,
+        `https://api.themoviedb.org/3/${mediaType}/${movie.id}/credits?${params}`,
         { signal: controller.signal },
       );
 
@@ -85,10 +95,10 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
       });
 
     return () => controller.abort();
-  }, [movie.id]);
+  }, [movie.id, isTV]);
 
   if (castLoading) {
-    return <Loading message="Loading movie details..." />;
+    return <Loading message="Loading details..." />;
   }
 
   return (
@@ -102,7 +112,7 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
           ← Back to movies
         </button>
         <span className="text-xs font-medium uppercase tracking-wider text-foreground">
-          Movie details
+          {isTV ? "TV Show details" : "Movie details"}
         </span>
       </div>
 
@@ -126,13 +136,13 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
         <div className="flex w-full min-w-0 flex-col items-start gap-4 text-left">
           <div>
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-              Featured movie
+              {isTV ? "TV Series" : "Featured movie"}
             </p>
             <h1 className="font-heading text-2xl font-bold leading-tight tracking-tight text-heading sm:text-3xl">
               {title}
             </h1>
             <p className="mt-2 text-sm text-foreground">
-              {movie.release_date || "Release date unavailable"}
+              {releaseDate || "Release date unavailable"}
               {movie.original_language && (
                 <span> · {movie.original_language.toUpperCase()}</span>
               )}
@@ -161,7 +171,7 @@ function MoviesInfo({ movie, onBack, onAddToWatchlist }) {
           Overview
         </h2>
         <p className="text-sm leading-relaxed text-foreground">
-          {movie.overview || "No overview is available for this movie."}
+          {movie.overview || "No overview is available."}
         </p>
       </section>
 

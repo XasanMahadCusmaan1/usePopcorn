@@ -27,7 +27,8 @@ function MoviePoster({ movie }) {
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
     : null;
-  const title = movie.title || movie.original_title || "Untitled movie";
+  // TV shows use `name`, movies use `title`
+  const title = movie.title || movie.name || movie.original_title || movie.original_name || "Untitled";
 
   if (!posterUrl || imageFailed) {
     return (
@@ -61,8 +62,13 @@ function MovieSearchList({
   return (
     <ul className="mt-6 grid grid-cols-1 gap-y-3 @md:grid-cols-2 @md:gap-x-4 ">
       {movies.map((movie) => {
-        const title = movie.title || movie.original_title || "Untitled movie";
+        const title = movie.title || movie.name || movie.original_title || movie.original_name || "Untitled";
+        // TV shows use `first_air_date`, movies use `release_date`
+        const releaseDate = movie.release_date || movie.first_air_date;
+        // TV shows use `genre_ids` too, so this works for both
         const genreIds = movie.genre_ids ?? [];
+        // Badge: show "TV" label for TV show results so users know the type
+        const isTV = movie.media_type === "tv";
 
         return (
           <li
@@ -78,7 +84,12 @@ function MovieSearchList({
                 {title}
               </h2>
               <div className="flex flex-wrap items-center gap-x-2 text-xs leading-relaxed text-foreground">
-                <span>{movie.release_date?.slice(0, 4) || "Year unknown"}</span>
+                <span>{releaseDate?.slice(0, 4) || "Year unknown"}</span>
+                {isTV && (
+                  <span className="rounded bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
+                    TV
+                  </span>
+                )}
                 <span aria-hidden="true">·</span>
                 <span className="font-semibold text-heading">
                   <span aria-hidden="true" className="text-accent">

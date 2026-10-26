@@ -71,9 +71,11 @@ function App() {
       });
 
       if (!debouncedQuery.trim()) {
-        url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${KEY}`;
+        // No search query → show trending (movies + TV combined)
+        url = `https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`;
       } else {
-        url = `https://api.themoviedb.org/3/search/movie?${params}`;
+        // User is searching → use multi-search (movies + TV shows + people)
+        url = `https://api.themoviedb.org/3/search/multi?${params}`;
       }
 
       const response = await fetch(url, {
@@ -85,7 +87,11 @@ function App() {
       }
 
       const data = await response.json();
-      setMovies(data.results);
+      // Filter out "person" results — we only want movies and TV shows
+      const filtered = (data.results ?? []).filter(
+        (item) => item.media_type !== "person",
+      );
+      setMovies(filtered);
     }
 
     loadMovies()
